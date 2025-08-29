@@ -1,14 +1,3 @@
-/* * Fichier de style QSS pour un thème sombre "confortable"
- * Palette de couleurs :
- * - Fond principal : #2B2B2B (Gris très foncé)
- * - Fond des éléments : #3C3F41 (Gris moyen)
- * - Texte : #F0F0F0 (Blanc cassé)
- * - Bordures : #555555 (Gris clair)
- * - Couleur d'accentuation (sélection, hover) : #4A90E2 (Bleu)
- * - Couleur de succès (barre de progression) : #2E7D32 (Vert)
-*/
-
-/* Fenêtre principale et widgets de base */
 QMainWindow, QWidget {
     background-color: #2B2B2B;
     color: #F0F0F0;
@@ -16,12 +5,10 @@ QMainWindow, QWidget {
     font-size: 10pt;
 }
 
-/* Labels */
 QLabel {
     color: #D0D0D0; /* Un peu moins vif que le texte principal */
 }
 
-/* Champs de saisie de texte */
 QLineEdit, QPlainTextEdit {
     background-color: #3C3F41;
     color: #F0F0F0;
@@ -34,7 +21,6 @@ QLineEdit:focus, QPlainTextEdit:focus {
     border: 1px solid #4A90E2; /* Bordure bleue lors de la sélection */
 }
 
-/* Boutons */
 QPushButton {
     background-color: #555555;
     color: #F0F0F0;
@@ -60,7 +46,6 @@ QPushButton:disabled {
     border: 1px solid #555555;
 }
 
-/* Barre de progression */
 QProgressBar {
     background-color: #3C3F41;
     color: #F0F0F0;
@@ -75,7 +60,6 @@ QProgressBar::chunk {
     margin: 1px;
 }
 
-/* Case à cocher */
 QCheckBox {
     spacing: 5px; /* Espace entre la case et le texte */
 }
@@ -97,12 +81,10 @@ QCheckBox::indicator:checked {
     image: url(none); /* Enlève la coche par défaut pour un look plus simple */
 }
 
-/* Boîtes de dialogue (ex: QMessageBox) */
 QMessageBox {
     background-color: #3C3F41;
 }
 
-/* Barres de défilement */
 QScrollBar:vertical {
     background: #3C3F41;
     width: 12px;
