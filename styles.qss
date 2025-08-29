@@ -1,0 +1,124 @@
+/* * Fichier de style QSS pour un thème sombre "confortable"
+ * Palette de couleurs :
+ * - Fond principal : #2B2B2B (Gris très foncé)
+ * - Fond des éléments : #3C3F41 (Gris moyen)
+ * - Texte : #F0F0F0 (Blanc cassé)
+ * - Bordures : #555555 (Gris clair)
+ * - Couleur d'accentuation (sélection, hover) : #4A90E2 (Bleu)
+ * - Couleur de succès (barre de progression) : #2E7D32 (Vert)
+*/
+
+/* Fenêtre principale et widgets de base */
+QMainWindow, QWidget {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+}
+
+/* Labels */
+QLabel {
+    color: #D0D0D0; /* Un peu moins vif que le texte principal */
+}
+
+/* Champs de saisie de texte */
+QLineEdit, QPlainTextEdit {
+    background-color: #3C3F41;
+    color: #F0F0F0;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+QLineEdit:focus, QPlainTextEdit:focus {
+    border: 1px solid #4A90E2; /* Bordure bleue lors de la sélection */
+}
+
+/* Boutons */
+QPushButton {
+    background-color: #555555;
+    color: #F0F0F0;
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 6px 12px;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    background-color: #6A6A6A;
+    border: 1px solid #777777;
+}
+
+QPushButton:pressed {
+    background-color: #4A90E2; /* Le bouton devient bleu quand on clique */
+    border: 1px solid #3A80D2;
+}
+
+QPushButton:disabled {
+    background-color: #444444;
+    color: #888888;
+    border: 1px solid #555555;
+}
+
+/* Barre de progression */
+QProgressBar {
+    background-color: #3C3F41;
+    color: #F0F0F0;
+    border: 1px solid #555555;
+    border-radius: 4px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #2E7D32; /* Progression en vert */
+    border-radius: 3px;
+    margin: 1px;
+}
+
+/* Case à cocher */
+QCheckBox {
+    spacing: 5px; /* Espace entre la case et le texte */
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    background-color: #3C3F41;
+}
+
+QCheckBox::indicator:hover {
+    border: 1px solid #777777;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #4A90E2; /* La case devient bleue une fois cochée */
+    image: url(none); /* Enlève la coche par défaut pour un look plus simple */
+}
+
+/* Boîtes de dialogue (ex: QMessageBox) */
+QMessageBox {
+    background-color: #3C3F41;
+}
+
+/* Barres de défilement */
+QScrollBar:vertical {
+    background: #3C3F41;
+    width: 12px;
+    margin: 0px 0px 0px 0px;
+}
+QScrollBar::handle:vertical {
+    background: #555555;
+    min-height: 20px;
+    border-radius: 6px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #6A6A6A;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
