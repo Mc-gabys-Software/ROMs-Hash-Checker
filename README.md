@@ -1,4 +1,4 @@
-# 🛡️ ROMs Hash Checker - Mc-security
+# 🛠️ ROMs Hash Checker - Mc-tools
 
 A simple and user-friendly **ROMs Hash Checker** built with **Python** and **PyQt6**.  
 It allows you to verify the integrity of your ROMs by comparing their **MD5 and SHA1 hashes** against `.dat` databases.
@@ -7,7 +7,7 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 
 ## ✨ Features
 
-- Compute **MD5** and **SHA1** hashes of ROM files (`.iso`)  
+- Compute **MD5** and **SHA1** hashes of ROM files (extensions supported in extensions.txt file)
 - Compare against `.dat` hash databases (placed in the `hashs` folder)  
 - Supports **recursive folder scanning**  
 - **Progress bar** for real-time analysis tracking  
@@ -40,7 +40,7 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
   python3 main.py
 - In the GUI:
 
-  - Select a single `.iso` file or a folder containing ROMs.
+  - Select a single ROM file or a folder containing ROMs.
   - Check "Analyze recursively" if you want to scan subfolders.
   - Click **Start Analysis**.
   - Follow the log to see which ROMs are found in the database.
@@ -49,9 +49,10 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 
 ## 🔒 Notes
 
-- Only .iso files are analyzed.
+- Only files present in the extensions.txt file are analyzed.
 - The program reads .dat files to build its hash database. Ensure they are valid XML DATs.
 - Progress and logs update in real-time during analysis.
+- Please, don't delete the extensions.txt file
 
 ---
 
