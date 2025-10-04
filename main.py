@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLa
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 HASH_FOLDER = "hashs"
+EXTENSIONS_FILE = "extensions.txt"
 
 HashDatabase = Dict[str, Dict[str, str]]
 
@@ -80,16 +81,23 @@ class HashCheckThread(QThread):
     def run(self):
         files_to_check = []
         base_path = Path(self.path_to_check)
+        found_files = 0
 
         if base_path.is_file():
             files_to_check.append(str(base_path))
         elif base_path.is_dir():
-            self.log_message.emit(f"🔍 Searching for .iso files in {self.path_to_check}...")
-            pattern = "**/*.iso" if self.recursive else "*.iso"
-            files_to_check = [str(p) for p in base_path.glob(pattern)]
-        
+            self.log_message.emit(f"🔍 Searching for valid ROMs files in {self.path_to_check}...")
+            pattern = "**/*.{ext}" if self.recursive else "*.{ext}"
+            extensions = []
+            if os.path.isfile(EXTENSIONS_FILE):
+                with open(EXTENSIONS_FILE, "r") as ef:
+                    extensions = [line.split()[0].lower() for line in ef if line.strip()]
+
+            for ext in extensions:
+                files_to_check.extend([str(p) for p in base_path.glob(pattern.format(ext=ext))])
+
         if not files_to_check:
-            self.log_message.emit("ℹ️ No .iso files found to analyze.")
+            self.log_message.emit("ℹ️ No valid ROM files found to analyze.")
             self.finished.emit()
             return
 
@@ -122,11 +130,12 @@ class HashCheckThread(QThread):
                     f"      (Source: {found_info['dat_source']})"
                 )
                 self.log_message.emit(message)
+                found_files += 1
             else:
                 self.log_message.emit(f"   └─ ❌ NOT FOUND in database.")
         
         self.progress.emit(100)
-        self.log_message.emit("\n✅ Analysis complete.")
+        self.log_message.emit(f"\n✅ Analysis complete. {found_files}/{total_files} files found on database.")
         self.finished.emit()
 
 class MainWindow(QMainWindow):
@@ -160,12 +169,17 @@ class MainWindow(QMainWindow):
 
         selection_layout = QHBoxLayout()
         self.path_line_edit = QLineEdit()
-        self.path_line_edit.setPlaceholderText("Select an .iso file or a ROMs folder")
+        self.path_line_edit.setPlaceholderText("Select a valid ROM file or a ROMs folder")
         selection_layout.addWidget(self.path_line_edit)
 
-        self.browse_btn = QPushButton("Browse...")
-        self.browse_btn.clicked.connect(self.browse_path)
-        selection_layout.addWidget(self.browse_btn)
+        self.browse_file_btn = QPushButton("Browse for file...")
+        self.browse_file_btn.clicked.connect(self.browse_path)
+        selection_layout.addWidget(self.browse_file_btn)
+        main_layout.addLayout(selection_layout)
+
+        self.browse_folder_btn = QPushButton("Browse for folder...")
+        self.browse_folder_btn.clicked.connect(self.browse_folder)
+        selection_layout.addWidget(self.browse_folder_btn)
         main_layout.addLayout(selection_layout)
 
         controls_layout = QHBoxLayout()
@@ -200,6 +214,14 @@ class MainWindow(QMainWindow):
             selected_path = dialog.selectedFiles()[0]
             self.path_line_edit.setText(selected_path)
 
+    def browse_folder(self):
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.setOption(QFileDialog.Option.ShowDirsOnly, True)
+        if dialog.exec():
+            selected_path = dialog.selectedFiles()[0]
+            self.path_line_edit.setText(selected_path)
+
     def start_analysis(self):
         path = self.path_line_edit.text().strip()
         if not path:
@@ -223,7 +245,8 @@ class MainWindow(QMainWindow):
 
     def set_ui_enabled(self, enabled: bool):
         self.path_line_edit.setEnabled(enabled)
-        self.browse_btn.setEnabled(enabled)
+        self.browse_file_btn.setEnabled(enabled)
+        self.browse_folder_btn.setEnabled(enabled)
         self.start_analysis_btn.setEnabled(enabled)
         self.recursive_checkbox.setEnabled(enabled)
         self.start_analysis_btn.setText("🚀 Start Analysis" if enabled else "Analyzing...")

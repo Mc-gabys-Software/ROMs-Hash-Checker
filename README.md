@@ -6,6 +6,7 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 ---
 
 ## ✨ Features
+
 - Compute **MD5** and **SHA1** hashes of ROM files (`.iso`)  
 - Compare against `.dat` hash databases (placed in the `hashs` folder)  
 - Supports **recursive folder scanning**  
@@ -16,22 +17,29 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 ---
 
 ## 📦 Requirements
+
 - Python **3.10+**  
 
 ## 🛠️ How to use
+
 - Clone the repository:
+
   ```bash
   git clone https://github.com/Mc-gabys/ROMs-Hash-Checker
 - Go to the project folder:
+
   ```bash
   cd ROMs-Hash-Checker
 - Install dependencies:
+
   ```bash
   python -m pip install -r requirements.txt
 - Run the script:
+
   ```bash
   python3 main.py
 - In the GUI:
+
   - Select a single `.iso` file or a folder containing ROMs.
   - Check "Analyze recursively" if you want to scan subfolders.
   - Click **Start Analysis**.
@@ -40,6 +48,7 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 ---
 
 ## 🔒 Notes
+
 - Only .iso files are analyzed.
 - The program reads .dat files to build its hash database. Ensure they are valid XML DATs.
 - Progress and logs update in real-time during analysis.
@@ -47,6 +56,7 @@ It allows you to verify the integrity of your ROMs by comparing their **MD5 and 
 ---
 
 ## ❤️ Support me on KoFi
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/N4N61K5R2A)
 
 ---
