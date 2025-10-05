@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, Optional
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QProgressBar, QMessageBox, QPlainTextEdit, QHBoxLayout, QCheckBox
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QProgressBar, QMessageBox, QPlainTextEdit, QHBoxLayout, QCheckBox, QTreeWidget, QTreeWidgetItem, QStyleFactory
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 HASH_FOLDER = "hashs"
@@ -70,6 +70,7 @@ def preprocess_dat_files() -> HashDatabase:
 class HashCheckThread(QThread):
     progress = pyqtSignal(int)
     log_message = pyqtSignal(str)
+    found_roms = pyqtSignal(object)
     finished = pyqtSignal()
 
     def __init__(self, path_to_check: str, recursive: bool, hash_db: HashDatabase):
@@ -130,6 +131,8 @@ class HashCheckThread(QThread):
                     f"      (Source: {found_info['dat_source']})"
                 )
                 self.log_message.emit(message)
+                info = {"file": relative_path, "name": found_info['name'], "source": found_info['dat_source']}
+                self.found_roms.emit(info)
                 found_files += 1
             else:
                 self.log_message.emit(f"   └─ ❌ NOT FOUND in database.")
@@ -141,10 +144,13 @@ class HashCheckThread(QThread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ROMs Hash Checker - Mc-security")
+        self.setWindowTitle("ROMs Hash Checker - Mc-tools")
         self.setGeometry(100, 100, 700, 500)
-        with open("styles.qss", "r") as f:
-            self.setStyleSheet(f.read())
+        try:
+            with open("styles.qss", "r") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            self.setStyleSheet("")
 
         self.hash_database = preprocess_dat_files()
         if not self.hash_database:
@@ -175,11 +181,11 @@ class MainWindow(QMainWindow):
         self.browse_file_btn = QPushButton("Browse for file...")
         self.browse_file_btn.clicked.connect(self.browse_path)
         selection_layout.addWidget(self.browse_file_btn)
-        main_layout.addLayout(selection_layout)
 
         self.browse_folder_btn = QPushButton("Browse for folder...")
         self.browse_folder_btn.clicked.connect(self.browse_folder)
         selection_layout.addWidget(self.browse_folder_btn)
+
         main_layout.addLayout(selection_layout)
 
         controls_layout = QHBoxLayout()
@@ -206,6 +212,14 @@ class MainWindow(QMainWindow):
         self.clear_log_btn = QPushButton("Clear Log")
         self.clear_log_btn.clicked.connect(self.results_text_edit.clear)
         main_layout.addWidget(self.clear_log_btn, alignment=Qt.AlignmentFlag.AlignRight)
+
+        main_layout.addWidget(QLabel("ROMs found:"))
+        self.found_roms_tree_widget = QTreeWidget()
+        self.found_roms_tree_widget.setHeaderLabels(["File Path", "ROM Name (Source)", "Source DAT File"])
+        self.found_roms_tree_widget.setColumnWidth(0, 400)
+        self.found_roms_tree_widget.setColumnWidth(1, 300)
+        self.found_roms_tree_widget.setColumnWidth(2, 300)
+        main_layout.addWidget(self.found_roms_tree_widget)
 
     def browse_path(self):
         dialog = QFileDialog(self)
@@ -240,6 +254,7 @@ class MainWindow(QMainWindow):
         self.hash_thread = HashCheckThread(path, recursive, self.hash_database)
         self.hash_thread.progress.connect(self.progress_bar.setValue)
         self.hash_thread.log_message.connect(self.append_log_message)
+        self.hash_thread.found_roms.connect(self.add_found_rom)
         self.hash_thread.finished.connect(lambda: self.set_ui_enabled(True))
         self.hash_thread.start()
 
@@ -253,6 +268,10 @@ class MainWindow(QMainWindow):
 
     def append_log_message(self, message: str):
         self.results_text_edit.appendPlainText(message)
+
+    def add_found_rom(self, info: Dict[str, str]):
+        item = QTreeWidgetItem([info['file'], info['name'], info['source']])
+        self.found_roms_tree_widget.addTopLevelItem(item)
 
     def closeEvent(self, event):
         if self.hash_thread and self.hash_thread.isRunning():
@@ -270,5 +289,5 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
