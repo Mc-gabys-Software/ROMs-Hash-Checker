@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Dict, Optional
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QProgressBar, QMessageBox, QPlainTextEdit, QHBoxLayout, QCheckBox, QTreeWidget, QTreeWidgetItem, QStyleFactory
+from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QLineEdit, QFileDialog, QProgressBar, QMessageBox, QPlainTextEdit, QHBoxLayout, QCheckBox, QTreeWidget, QTreeWidgetItem, QTabWidget, QTextEdit
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 HASH_FOLDER = "hashs"
@@ -167,7 +167,13 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
-        main_layout = QVBoxLayout(main_widget)
+        central_layout = QVBoxLayout(main_widget)
+
+        self.tabs = QTabWidget()
+        central_layout.addWidget(self.tabs)
+
+        main_tab = QWidget()
+        main_layout = QVBoxLayout(main_tab)
 
         label = QLabel("ROMs Hash Checker by Mc-gabys")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -220,6 +226,24 @@ class MainWindow(QMainWindow):
         self.found_roms_tree_widget.setColumnWidth(1, 300)
         self.found_roms_tree_widget.setColumnWidth(2, 300)
         main_layout.addWidget(self.found_roms_tree_widget)
+
+        self.tabs.addTab(main_tab, "Main")
+
+        info_tab = QWidget()
+        info_layout = QVBoxLayout(info_tab)
+        info_text = QTextEdit()
+        info_text.setReadOnly(True)
+        info_text.setPlainText(
+            "Usage:\n\n" 
+            "1) Select a single ROM file or a folder containing ROMs.\n"
+            "2) If you choose a folder, you can enable 'Analyze recursively' to search subfolders.\n"
+            "3) Click 'Start Analysis' to compute MD5/SHA1 hashes and compare against the DAT database.\n\n"
+            "Notes:\n"
+            "- You can add your own DAT files to the 'hashs' folder.\n"
+            "- Supported extensions are read from 'extensions.txt' (one per line). If you add DAT files with other extensions, update 'extensions.txt' with those extensions.\n"
+        )
+        info_layout.addWidget(info_text)
+        self.tabs.addTab(info_tab, "Info")
 
     def browse_path(self):
         dialog = QFileDialog(self)

@@ -24,7 +24,6 @@ QPlainTextEdit {
 
 QLineEdit:focus, QPlainTextEdit:focus {
     border: 1px solid #4aa3ff;
-    box-shadow: 0 0 6px rgba(74,163,255,0.12);
 }
 
 QPushButton {
