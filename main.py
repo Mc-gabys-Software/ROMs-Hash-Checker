@@ -180,7 +180,8 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(label)
 
         selection_layout = QHBoxLayout()
-        self.path_line_edit = QLineEdit()
+
+        self.path_line_edit = PathLineEdit()
         self.path_line_edit.setPlaceholderText("Select a valid ROM file or a ROMs folder")
         selection_layout.addWidget(self.path_line_edit)
 
@@ -225,6 +226,7 @@ class MainWindow(QMainWindow):
         self.found_roms_tree_widget.setColumnWidth(0, 400)
         self.found_roms_tree_widget.setColumnWidth(1, 300)
         self.found_roms_tree_widget.setColumnWidth(2, 300)
+        self.found_roms_tree_widget.doubleClicked.connect(self.openDirectory)
         main_layout.addWidget(self.found_roms_tree_widget)
 
         self.tabs.addTab(main_tab, "Main")
@@ -235,7 +237,7 @@ class MainWindow(QMainWindow):
         info_text.setReadOnly(True)
         info_text.setPlainText(
             "Usage:\n\n" 
-            "1) Select a single ROM file or a folder containing ROMs.\n"
+            "1) Select or drag-and-drop a single ROM file or a folder containing ROMs.\n"
             "2) If you choose a folder, you can enable 'Analyze recursively' to search subfolders.\n"
             "3) Click 'Start Analysis' to compute MD5/SHA1 hashes and compare against the DAT database.\n\n"
             "Notes:\n"
@@ -297,6 +299,20 @@ class MainWindow(QMainWindow):
         item = QTreeWidgetItem([info['file'], info['name'], info['source']])
         self.found_roms_tree_widget.addTopLevelItem(item)
 
+    def openDirectory(self):
+        item = self.found_roms_tree_widget.currentItem()
+        if item:
+            file_path = item.text(0)
+            base_path = Path(self.path_line_edit.text().strip())
+            if base_path.is_file():
+                full_path = base_path
+            else:
+                full_path = base_path.parent / file_path
+
+            directory = os.path.dirname(full_path)
+            if os.path.exists(directory):
+                os.startfile(directory)
+
     def closeEvent(self, event):
         if self.hash_thread and self.hash_thread.isRunning():
             reply = QMessageBox.question(
@@ -309,6 +325,28 @@ class MainWindow(QMainWindow):
                 return
 
         event.accept()
+
+class PathLineEdit(QLineEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        mime = event.mimeData()
+        if mime.hasUrls():
+            event.acceptProposedAction()
+        else:
+            super().dragEnterEvent(event)
+
+    def dropEvent(self, event):
+        mime = event.mimeData()
+        if mime.hasUrls():
+            url = mime.urls()[0]
+            path = url.toLocalFile()
+            if path:
+                self.setText(path)
+        else:
+            super().dropEvent(event)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
